@@ -1,0 +1,7 @@
+CREATE TABLE todo
+    (
+        id SERIAL NOT NULL,
+        task_name character varying(255) NOT NULL,
+        task_complete boolean NOT NULL,
+        CONSTRAINT todo_pkey PRIMARY KEY (id)
+    );
