@@ -63,6 +63,52 @@ app.post('/task', function(req, res) {
 
 });
 
+app.post('/complete', function(req, res) {
+    var completeTask = {
+        task_complete: req.body.type
+    };
+
+    pg.connect(connectionString, function(err, client, done) {
+        client.query("UPDATE todo SET task_complete = TRUE WHERE id = $1 RETURNING id",
+            [completeTask.task_complete],
+            function (err, result) {
+                done();
+                if(err) {
+                    console.log("Error inserting data: ", err);
+                    res.send(false);
+                } else {
+                    res.send(result);
+                }
+            });
+    });
+
+});
+
+// Changed to use the 'delete' method (matching our Ajax type property)
+app.delete('/delete', function(req, res) {
+    var deleteTask = {
+        //here id needs to be assigned to what is in the object coming back from line 79 in clientapp.js
+        //id: req.body.type is what you're looking for
+        id: req.body.type
+    };
+
+    pg.connect(connectionString, function(err, client, done) {
+        // DELETE syntax in SQL doesn't have VAlUES, just a WHERE to find what you really want to get rid of
+        client.query("DELETE FROM todo WHERE id = $1",
+            [deleteTask.id],
+            function (err, result) {
+                done();
+                if(err) {
+                    console.log("Error inserting data: ", err);
+                    res.send(false);
+                } else {
+                    res.send(result);
+                }
+            });
+    });
+
+});
+
 
 app.get('/*', function(req, res) {
     var file = req.params[0] || '/views/index.html';
