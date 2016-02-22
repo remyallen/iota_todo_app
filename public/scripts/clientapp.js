@@ -43,6 +43,8 @@ function postData() {
 }
 
 function getData() {
+    $('.task').remove();
+
     $.ajax({
         type: 'GET',
         url: '/task',
@@ -58,7 +60,7 @@ function getData() {
                 $el.append('<h2>' + task.task_name + '</h2>');
                 // The checkbox here is unnecessary unless you really want to allow deleting multiple
                 // tasks, which is rather tricky to do. I'd skip it.
-                $el.append('<label><input type="checkbox">Complete</label>' +
+                $el.append('<label><input type="checkbox" data-type="' + task.id + '">Complete</label>' +
                     '<button class="delete-data">Delete</button>');
             });
         }
@@ -72,9 +74,9 @@ function showComplete(){
     $(this).toggleClass('highLight');
 
     var values = {};
-    values.type = $(this).parent().data('type');
-
-    console.log(values);
+    values.type = $(this).data('type');
+    console.log($(this).data('type'));
+    console.log(values.type);
 
     $.ajax({
         type: 'POST',
@@ -84,10 +86,11 @@ function showComplete(){
             if(data) {
                 // everything went ok
                 console.log('from server:', data);
+                getData();
             } else {
                 console.log('error');
             }
-        }
+        },
     });
 }
 

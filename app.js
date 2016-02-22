@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.get('/task', function(req, res) {
     var results = [];
     pg.connect(connectionString, function(err, client, done) {
-        var query = client.query('SELECT * FROM todo ORDER BY id DESC;');
+        var query = client.query('SELECT * FROM todo ORDER BY task_complete, id ASC;');
 
         // Stream results back one row at a time
         query.on('row', function(row) {
@@ -65,12 +65,13 @@ app.post('/task', function(req, res) {
 
 app.post('/complete', function(req, res) {
     var completeTask = {
-        task_complete: req.body.type
+        id: req.body.type
     };
+    console.log(req.body.type);
 
     pg.connect(connectionString, function(err, client, done) {
-        client.query("UPDATE todo SET task_complete = TRUE WHERE id = $1 RETURNING id",
-            [completeTask.task_complete],
+        client.query("UPDATE todo SET task_complete = NOT task_complete WHERE id = ($1) RETURNING id",
+            [completeTask.id],
             function (err, result) {
                 done();
                 if(err) {
